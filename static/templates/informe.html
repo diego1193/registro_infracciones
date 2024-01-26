@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Informe de Infracciones</title>
+    <link rel="stylesheet" href="{% static 'css/styles_informe.css' %}">
+</head>
+<body>
+    <h1>Informe de Infracciones</h1>
+
+    <!-- Campo para ingresar el correo -->
+    <div>
+        <input type="email" id="email-input" placeholder="Ingrese su correo electrónico">
+        <button id="load-data-btn">Cargar Informe</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Placa Patente</th>
+                <th>Timestamp</th>
+                <th>Comentarios</th>
+            </tr>
+        </thead>
+        <tbody id="informe-table-body">
+            <!-- Los datos se cargarán aquí -->
+        </tbody>
+    </table>
+
+    <script src="{% static 'js/script.js' %}?v=20240128"></script>
+</body>
+</html>

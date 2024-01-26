@@ -1,0 +1,75 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 300px;
+}
+
+h1 {
+    color: #333;
+    text-align: center;
+}
+
+form {
+    margin-top: 20px;
+}
+
+input,
+button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box; /* Asegúrate de que padding no afecte el ancho total */
+}
+
+button {
+    background-color: #5cb85c;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #4cae4c;
+}
+
+/* Estilos para errores de validación */
+.errorlist {
+    color: red;
+    margin-bottom: 10px;
+}
+
+/* Personalizaciones adicionales para los widgets de fecha/hora si es necesario */
+input[type="datetime-local"] {
+    color: #666;
+}
+
+/* Si necesitas estilos específicos para cada campo */
+.form-row {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* Ocultar los elementos de validación de HTML5 */
+form input:invalid {
+    box-shadow: none;
+}

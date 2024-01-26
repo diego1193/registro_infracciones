@@ -1,0 +1,19 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Agregar Infracción</title>
+    <link rel="stylesheet" href="{% static 'css/styles_carga.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Agregar Infracción</h1>
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Guardar Infracción</button>
+        </form>
+    </div>
+</body>
+</html>
