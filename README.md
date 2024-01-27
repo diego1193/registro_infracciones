@@ -111,7 +111,7 @@ git clone https://github.com/diego1193/registro_infracciones.git
   ```bash
   python -m venv entorno
   source entorno/bin/activate 
-  pip install -r requirements
+  pip install -r requirements.txt
   ```
 
   **Iniciar el proyecto**:
