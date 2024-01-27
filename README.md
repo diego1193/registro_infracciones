@@ -100,7 +100,7 @@ git clone https://github.com/diego1193/registro_infracciones.git
   **Lanzar imagen**:
   Para iniciar la imagen descargada, utiliza:
   ```bash
-  docker pull diego1193/infracciones_gestion
+  docker run -p 8000:8000 diego1193/infracciones_gestion
   ```
   
 - Desde local:
