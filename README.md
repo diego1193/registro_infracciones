@@ -87,7 +87,7 @@ Para obtener una copia del proyecto, clónalo en la carpeta de tu elección util
 git clone https://github.com/diego1193/registro_infracciones.git
 ```
 
-###Ejecución del Programa
+### Ejecución del Programa
 
 - Mediante **Docker Hub**:
   Puedes usar la imagen del repositorio [infracciones_gestion](https://hub.docker.com/r/diego1193/infracciones_gestion), siguiendo estos pasos:
@@ -109,14 +109,15 @@ git clone https://github.com/diego1193/registro_infracciones.git
   **Configurar el entorno virtual**:
   Para preparar el entorno de ejecución, ejecuta:
   ```bash
-  source .env/bin/source
+  python -m venv entorno
+  source entorno/bin/activate 
+  pip install -r requirements
   ```
-  > **Nota**: el entorno para ejecutar el programa se encuentra en la carpeta ".env"
 
   **Iniciar el proyecto**:
   Para lanzar el proyecto, utiliza:
   ```bash
-  python manage.py registro_infracciones
+  python manage.py runserver
   ```
   
 ## Iterfaz administrativa
@@ -133,71 +134,65 @@ El usuario y contrasena son los siguientes
 Usuario: root
 Password: root
 ``` 
----------------------------       -------------------------------------
-### Registro de Usuario
 
-Para registrar un nuevo usuario, envía una petición POST a la siguiente URL:
+En esta sección, podrás gestionar registros para varios modelos, incluyendo Oficiales, Personas, Vehículos e Infracciones. Cada categoría ofrece opciones para crear, visualizar, modificar y eliminar registros.
 
-```
-http://localhost:8000/registro/
-``` 
+### Personas:
+Aquí encontrarás opciones para buscar personas por nombre o correo electrónico. Utiliza el botón `ADD PERSONA` para agregar nuevas entradas o la opción `Action` para eliminar registros existentes. Al crear un registro, deberás proporcionar el nombre y el correo electrónico de la persona.
 
-Incluye en la petición un JSON con los datos del usuario. Por ejemplo:
+### Vehiculos
+Esta sección permite buscar vehículos por placa o propietario. Para agregar un vehículo, selecciona `ADD VEHÍCULO` y utiliza `Action` para eliminarlos. Al registrar un vehículo, es necesario completar varios campos obligatorios, incluyendo la relación con el propietario, que debe estar vinculado a un registro de persona previamente creado.
+
+### Users
+Encontrarás opciones para buscar usuarios por nombre de usuario o dirección de correo electrónico. Usa `ADD USUARIO` para añadir nuevos usuarios o `Action` para eliminarlos. Al crear un usuario, debes proporcionar información requerida como el nombre de usuario y la contraseña, asegurándote de no activar la opción de superusuario.
+
+### Oficiales
+Aquí puedes buscar oficiales por nombre o número de identificación. Para agregar un oficial, utiliza `ADD OFICIAL` y `Action` para su eliminación. Al crear un registro de oficial, se requieren ciertos campos, incluyendo una relación con un registro de usuario previo. Es importante crear primero el usuario y luego asignarlo al oficial, lo que facilitará posteriormente el uso de la API para agregar infracciones, realizar login, crear token y efectuar peticiones POST.
+
+## APIs
+He desarrollado las APIs **generar_informe** y **crear_infraccion** de dos maneras distintas. A continuación, explico el funcionamiento de ambas:
+
+### Generacion Token
+La autenticación se realiza mediante un Bearer token, obtenido tras iniciar sesión con el usuario y contraseña de un oficial. Este proceso es esencial para acceder a las funcionalidades de las APIs.
+
+Es importante utilizar las credenciales correctas, que deben estar registradas en el apartado de Usuario en el admin y asignadas a un oficial específico.
+
+### Login para pruebas
+Para las pruebas, se puede utilizar el siguiente usuario de prueba, ya incluido en la base de datos:
 
 ```json
 {
-  "nombre": "Juan Perez",
-  "correo": "juanperez@example.com",
-  "contrasena": "password123"
+  "username": "ramirez",
+  "password": "juan1234"
 }
 ``` 
-Si el registro es exitoso, recibirás un código de estado HTTP 201 y los detalles del usuario recién creado.
+### Login mediante banner:  
+Al ingresar a http://localhost:8000/login_user/ y proporcionar las credenciales correctas, serás redirigido a la página **crear_infraccion**
 
-Ejemplo de respuesta:
+![Img 1](/imagenes/img_1.png)
 
- ![Img 1](/imagenes_readme/img2.jpeg)
-
- ### Login de Usuario
-
-Para iniciar sesión, envía una petición POST a la siguiente URL:
-
+### Login demostrado en Postman
+Peticion HTTP POST 
 ```
 http://localhost:8000/login/
 ``` 
+Mediante una petición HTTP POST a http://localhost:8000/login/, recibirás, si es exitoso, un código de estado HTTP 200 junto con un JSON que contiene dos tokens: refresh y access. El token de acceso se utiliza para autenticar solicitudes a endpoints protegidos, mientras que el token de actualización sirve para obtener un nuevo token de acceso cuando sea necesario.
 
-Incluye las credenciales del usuario en el cuerpo de la petición en formato JSON. Por ejemplo:
+ejemplo:
+![Img 2](/imagenes/img_2.png)
 
-```json
-{
-  "correo": "juan@example.com",
-  "contrasena": "password123"
-}
-``` 
-Una respuesta exitosa devolverá un código de estado HTTP 201 y un JSON con dos tokens: refresh y access. El token refresh se utiliza para obtener un nuevo token access cuando sea necesario, mientras que el token access se usa como JSON Web Token para autenticar las solicitudes a los endpoints protegidos.
- 
-Ejemplo de respuesta:
+## Agregando JWT a los Endpoints
 
- ![Img 2](/imagenes_readme/img3.jpeg)
-
-### Agregando JWT a los Endpoints
-
-Para probar los endpoints protegidos en Postman, necesitarás incluir el JSON Web Token (JWT) obtenido después del inicio de sesión. Si estás utilizando el [Workspace de Postman](https://app.getpostman.com/join-team?invite_code=f6fe94c368956d7061029e348d7eb8b7&target_code=bbb9099bcfa6c47b14afdb2b48a10ac), puedes configurar el token como una variable global de entorno.
+Para probar los endpoints protegidos en Postman, necesitarás incluir el JSON Web Token (JWT) obtenido después del inicio de sesión. Si estás utilizando el [Workspace de Postman](https://www.postman.com/red-sunset-571136/workspace/infracciones/overview), puedes configurar el token como una variable global de entorno.
 
 #### Configuración del Token:
 
 1. **Obtener el Token**: Inicia sesión mediante el endpoint de login para obtener el `access token`.
 
-    Ejemplo de token obtenido:
-    
-    ![Imagen del Token](/imagenes_readme/img4.jpeg)
 
 2. **Agregar el Token al Entorno Global**:
    
-    En Postman, ve a la sección de "Environments" y configura una nueva variable global llamada `token` con el valor del JWT.
-
-    Cómo agregar el token:
-    
-    ![Agregar Token al Entorno Global](/imagenes_readme/img5.jpeg)
+    En Postman, ve a la sección de "Environments" y configura una nueva variable global llamada `accaessToken` con el valor del JWT.
 
 #### Uso del Token en las Solicitudes:
 
@@ -206,142 +201,43 @@ Para probar los endpoints protegidos en Postman, necesitarás incluir el JSON We
 
 Siguiendo estos pasos, podrás probar fácilmente los endpoints protegidos de tu API en Postman.
 
----
 
-### CRUD de Entidades
+## API Crear Infracción
 
-Las operaciones CRUD (Crear, Leer, Actualizar, Eliminar) están disponibles para las siguientes entidades: Clientes, Productos y Facturas. A continuación, se detallan los endpoints y ejemplos para cada entidad.
+### Creación de Infracción Mediante Banner:
+Tras iniciar sesión, serás redirigido a http://localhost:8000/cargar_infraccion/ . Aquí, un formulario te permitirá completar tres campos. Al seleccionar el ícono del calendario, podrás elegir fácilmente la fecha y hora del incidente.
 
-#### Instrucciones Generales
+![Img 3](/imagenes/img_3.png)
 
-- Para todas las operaciones CRUD, asegúrate de incluir el token JWT en la cabecera `Authorization` de tu petición.
-- Las peticiones POST y PUT deben incluir un cuerpo en formato JSON con los datos relevantes.
-- Las respuestas incluirán un código de estado HTTP y, en algunos casos, datos adicionales o confirmación de la acción realizada.
+### Creación de Infracción en Postman:
 
----
-
-### CRUD Clientes
-
-- **GET `http://127.0.0.1:8000/clients/`**: Obtiene todos los clientes.
-- **POST `http://127.0.0.1:8000/clients/`**: Crea un nuevo cliente.
-- **PUT `http://127.0.0.1:8000/clients/{id}/`**: Actualiza un cliente existente.
-- **DELETE `http://127.0.0.1:8000/clients/{id}/`**: Elimina un cliente.
-
-Ejemplo de petición POST y PUT para crear un cliente:
+Para realizar esta acción, es crucial incluir el token JWT en la cabecera `Authorization`. Al enviar una petición HTTP POST a http://localhost:8000/carga_infraccion/, recibirás una respuesta con un código de estado HTTP 200 y un JSON confirmando el proceso completado.
 
 ```json
 {
-  "document": "12347",
-  "first_name": "Juan",
-  "last_name": "Melo",
-  "email": "juan.melo2@example.com"
+    "placa_patente": "JCD099",
+    "timestamp": "2024-01-25T00:00:00Z",
+    "comentarios": "paso semaforo en rojo"
 }
-```
- ---
- ### CRUD Productos
+``` 
+ejemplo:
 
-- **GET `http://127.0.0.1:8000/products/`**: Obtiene todos los producto.
-- **POST `http://127.0.0.1:8000/products/`**: Crea un nuevo producto.
-- **PUT `http://127.0.0.1:8000/products/{id}/`**: Actualiza un producto existente.
-- **DELETE `http://127.0.0.1:8000/products/{id}/`**: Elimina un producto.
+![Img 4](/imagenes/img_4.png)
 
-Ejemplo de petición POST y PUT para crear un producto:
+****
 
-```json
-{
-  "name": "Producto 2",
-  "description": "Descripción del Producto Ejemplo"
-}
-```
- ---
- ### CRUD Facturas
+## API Generar Informe
 
-- **GET `http://127.0.0.1:8000/bills/`**: Obtiene todos las factura.
-- **POST `http://127.0.0.1:8000/bills/`**: Crea una nueva factura.
-- **PUT `http://127.0.0.1:8000/bills/{id}/`**: Actualiza una factura existente.
-- **DELETE `http://127.0.0.1:8000/bills/{id}/`**: Elimina una factura.
+### Generar Informe Mediante Banner:
+En http://localhost:8000/informe/, un formulario te permitirá ingresar el correo electrónico del dueño del vehículo (Registro Persona) registrado. Al hacer clic en buscar, se mostrarán las infracciones asociadas a ese vehículo.
 
-Ejemplo de petición POST y PUT para crear una factura:
+ejemplo:
+![Img 5](/imagenes/img_5.png)
 
-```json
-{
-  "client_id": 1, // Asegúrate de que este ID exista en tu base de datos
-  "company_name": "Gufy 1 S.A.S",
-  "nit": 1234562,
-  "code": "Factura003"
-}
-```
----
- ### CRUD Factura Producto
+### Generar Informe en Postman:
 
-- **GET `http://127.0.0.1:8000/billproducts/`**: Obtiene todos las facturas producto.
-- **POST `http://127.0.0.1:8000/billproducts/`**: Crea una nueva facturas producto.
-- **PUT `http://127.0.0.1:8000/billproducts/{id}/`**: Actualiza una facturas producto.
-- **DELETE `http://127.0.0.1:8000/billproducts/{id}/`**: Elimina una facturas producto.
+Realizando una petición HTTP GET a http://127.0.0.1:8000/generar_informe/[email de la persona]/, recibirás como respuesta un código de estado HTTP 200 y un JSON con un listado detallado de las infracciones del vehículo.
 
-Ejemplo de petición POST y PUT para crear una facturas producto.:
+ejemplo:
 
-```json
-{
-  "client_id": 1, // Asegúrate de que este ID exista en tu base de datos
-  "company_name": "Gufy 1 S.A.S",
-  "nit": 1234562,
-  "code": "Factura003"
-}
-```
----
-### Endpoints para Manejo de CSV
-
-Para utilizar estos endpoints, es necesario incluir el JSON Web Token (JWT) en la cabecera de autorización.
-
-#### Generación de CSV
-
-- **GET `http://localhost:8000/generate-csv/`**: Inicia la generación de un archivo CSV de forma asíncrona. Este archivo incluye los nombres completos de los clientes, su documento y el número de facturas asociadas a cada cliente.
-
-    Ejemplo de respuesta al iniciar la generación del CSV:
-
-    ```json
-    {
-        "message": "Generación de CSV iniciada",
-        "task_id": "850291b9-5fb0-4f4a-8688-91fce9cd55b6"
-    }
-    ```
----
-#### Consulta del Estado del CSV
-
-
-- **GET `http://localhost:8000/get-csv-status/{task_id}/`**:  Consulta el estado de la generación del CSV. Reemplaza {task_id} con el ID de tarea obtenido en la generación del CSV.
-
-    Ejemplo de respuesta:
-
-    ```json
-    {
-        "status": "Completado",
-        "ruta": "clientes.csv"
-    }
-    ```
----
-
-#### Descarga del CSV
-
-
-- **GET `http://localhost:8000/descargar-csv/`**:  Descarga el archivo CSV generado.
-
-    Ejemplo de contenido del CSV:
-
-    ```
-    documento,nombre_completo,cantidad_facturas
-    12347,Juan Melo,0
-    ```
-
----
-#### Cargue Masivo de Clientes
-
-
-- **POST `http://localhost:8000/cargar-clientes/`**: Permite el cargue masivo de clientes mediante la subida de un archivo CSV.
-
-    Sigue este formato para la carga del archivo:
-
-    ![Imagen SUBIR CSV](/imagenes_readme/IMG1.jpeg)
-
-    Puedes descargar el archivo `usuarios_prueba.csv` como plantilla para facilitar el proceso de carga masiva de clientes.
+![Img 6](/imagenes/img_6.png)
